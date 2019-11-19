@@ -11,9 +11,9 @@ output "target_group_arn" {
   value       = aws_lb_target_group.task.arn
 }
 
-output "target_group_arn_suffix"{
+output "target_group_arn_suffix" {
   description = "The ARN suffix for use with CloudWatch Metrics."
-  value = aws_lb_target_group.task.arn_suffix
+  value       = aws_lb_target_group.task.arn_suffix
 }
 
 output "target_group_name" {
