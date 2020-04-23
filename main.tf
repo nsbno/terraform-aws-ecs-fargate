@@ -154,7 +154,8 @@ resource "aws_ecs_task_definition" "task" {
         }
     },
     "command": ${jsonencode(var.task_container_command)},
-    "environment": ${jsonencode(data.null_data_source.task_environment.*.outputs)}
+    "environment": ${jsonencode(data.null_data_source.task_environment.*.outputs)},
+    "ulimits": ${jsonencode(var.task_container_ulimits)}
 }]
 EOF
 
