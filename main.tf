@@ -114,13 +114,41 @@ resource "aws_lb_target_group" "task" {
 # ------------------------------------------------------------------------------
 # ECS Task/Service
 # ------------------------------------------------------------------------------
-data "null_data_source" "task_environment" {
-  count = var.task_container_environment_count
+locals {
+  task_environment = [
+    for k, v in var.task_container_environment : {
+      name  = k
+      value = v
+    }
+  ]
+}
 
-  inputs = {
-    name  = element(keys(var.task_container_environment), count.index)
-    value = element(values(var.task_container_environment), count.index)
+locals {
+  container_definition = {
+    name      = var.container_name != "" ? var.container_name : var.name_prefix
+    image     = var.task_container_image
+    essential = true
+    portMappings = [{
+      containerPort = var.task_container_port,
+      hostPort      = var.task_container_port,
+      protocol      = "tcp"
+    }]
+    logConfiguration = {
+      "logDriver" : "awslogs",
+      "options" : {
+        "awslogs-group" : aws_cloudwatch_log_group.main.name,
+        "awslogs-region" : data.aws_region.current.name,
+        "awslogs-stream-prefix" : "container"
+      }
+    }
+    command     = var.task_container_command
+    environment = local.task_environment
+    ulimits     = var.task_container_ulimits
+    repository_credentials = var.repository_credentials == "" ? null : {
+      credentialsParameter = var.repository_credentials
+    }
   }
+  container_definition_json = jsonencode(local.container_definition)
 }
 
 resource "aws_ecs_task_definition" "task" {
@@ -131,33 +159,7 @@ resource "aws_ecs_task_definition" "task" {
   cpu                      = var.task_definition_cpu
   memory                   = var.task_definition_memory
   task_role_arn            = aws_iam_role.task.arn
-
-  container_definitions = <<EOF
-[{
-    "name": "${var.container_name != "" ? var.container_name : var.name_prefix}",
-    "image": "${var.task_container_image}",
-    ${local.repository_credentials_rendered}
-    "essential": true,
-    "portMappings": [
-        {
-            "containerPort": ${var.task_container_port},
-            "hostPort": ${var.task_container_port},
-            "protocol":"tcp"
-        }
-    ],
-    "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-            "awslogs-group": "${aws_cloudwatch_log_group.main.name}",
-            "awslogs-region": "${data.aws_region.current.name}",
-            "awslogs-stream-prefix": "container"
-        }
-    },
-    "command": ${jsonencode(var.task_container_command)},
-    "environment": ${jsonencode(data.null_data_source.task_environment.*.outputs)}
-}]
-EOF
-
+  container_definitions    = "[${local.container_definition_json}]"
 }
 
 resource "aws_ecs_service" "service" {

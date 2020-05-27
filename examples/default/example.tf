@@ -72,7 +72,6 @@ module "fargate" {
   private_subnet_ids   = data.aws_subnet_ids.main.ids
   cluster_id           = aws_ecs_cluster.cluster.id
   task_container_image = "crccheck/hello-world:latest"
-
   // public ip is needed for default vpc, default is false
   task_container_assign_public_ip = true
 

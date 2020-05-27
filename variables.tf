@@ -90,6 +90,16 @@ variable "task_container_environment_count" {
   type        = number
 }
 
+variable "task_container_ulimits" {
+  type = list(object({
+    name      = string
+    hardLimit = number
+    softLimit = number
+  }))
+  description = "(Optional) Container ulimit settings. This is a list of maps, where each map should contain \"name\", \"hardLimit\" and \"softLimit\""
+  default     = null
+}
+
 variable "log_retention_in_days" {
   description = "Number of days the logs will be retained in CloudWatch."
   default     = 30
@@ -144,15 +154,3 @@ variable "repository_credentials_kms_key" {
   type        = string
 }
 
-locals {
-  # if the variable is set, create the fragment based on the variable value
-  # if not, just return a empty string to not mess up the json
-  repository_credentials_fragment = <<EOF
-        "repositoryCredentials": {
-            "credentialsParameter": "${var.repository_credentials}"
-        },
-EOF
-
-
-  repository_credentials_rendered = var.repository_credentials == "" ? "" : local.repository_credentials_fragment
-}
