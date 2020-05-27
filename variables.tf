@@ -154,15 +154,3 @@ variable "repository_credentials_kms_key" {
   type        = string
 }
 
-locals {
-  # if the variable is set, create the fragment based on the variable value
-  # if not, just return a empty string to not mess up the json
-  repository_credentials_fragment = <<EOF
-        "repositoryCredentials": {
-            "credentialsParameter": "${var.repository_credentials}"
-        },
-EOF
-
-
-  repository_credentials_rendered = var.repository_credentials == "" ? "" : local.repository_credentials_fragment
-}
