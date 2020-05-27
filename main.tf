@@ -114,15 +114,14 @@ resource "aws_lb_target_group" "task" {
 # ------------------------------------------------------------------------------
 # ECS Task/Service
 # ------------------------------------------------------------------------------
-data "null_data_source" "task_environment" {
-  count = var.task_container_environment_count
-
-  inputs = {
-    name  = element(keys(var.task_container_environment), count.index)
-    value = element(values(var.task_container_environment), count.index)
+locals {
+  task_environment = [
+  for k, v in var.task_container_environment : {
+    name  = k
+    value = v
   }
+  ]
 }
-
 
 locals {
   container_definition = {
@@ -143,7 +142,7 @@ locals {
       }
     }
     command     = var.task_container_command
-    environment = data.null_data_source.task_environment.*.outputs
+    environment = local.task_environment
     ulimits     = var.task_container_ulimits
     repository_credentials = var.repository_credentials == "" ? null : {
       credentialsParameter = var.repository_credentials
