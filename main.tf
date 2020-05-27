@@ -116,10 +116,10 @@ resource "aws_lb_target_group" "task" {
 # ------------------------------------------------------------------------------
 locals {
   task_environment = [
-  for k, v in var.task_container_environment : {
-    name  = k
-    value = v
-  }
+    for k, v in var.task_container_environment : {
+      name  = k
+      value = v
+    }
   ]
 }
 
