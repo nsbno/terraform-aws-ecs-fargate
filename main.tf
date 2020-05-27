@@ -137,8 +137,8 @@ locals {
     logConfiguration = {
       "logDriver" : "awslogs",
       "options" : {
-        "awslogs-group" : "loggroupname",
-        "awslogs-region" : "eu-west-1",
+        "awslogs-group" : aws_cloudwatch_log_group.main.name,
+        "awslogs-region" : data.aws_region.current.name,
         "awslogs-stream-prefix" : "container"
       }
     }
