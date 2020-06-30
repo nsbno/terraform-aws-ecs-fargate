@@ -90,6 +90,12 @@ variable "task_container_environment_count" {
   type        = number
 }
 
+variable "task_container_secrets" {
+  description = "The secret variables to pass to a container."
+  default     = {}
+  type        = map(string)
+}
+
 variable "task_container_ulimits" {
   type = list(object({
     name      = string

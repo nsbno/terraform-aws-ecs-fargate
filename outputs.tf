@@ -31,6 +31,11 @@ output "task_role_name" {
   value       = aws_iam_role.task.name
 }
 
+output "execution_role_name" {
+  description = "The name of the execution role."
+  value       = aws_iam_role.execution.name
+}
+
 output "service_sg_id" {
   description = "The Amazon Resource Name (ARN) that identifies the service security group."
   value       = aws_security_group.ecs_service.id
