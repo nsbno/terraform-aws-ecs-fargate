@@ -121,6 +121,12 @@ locals {
       value = v
     }
   ]
+  task_secrets = [
+    for k, v in var.task_container_secrets : {
+      name      = k
+      valueFrom = v
+    }
+  ]
 }
 
 locals {
@@ -143,6 +149,7 @@ locals {
     }
     command     = var.task_container_command
     environment = local.task_environment
+    secrets     = local.task_secrets
     ulimits     = var.task_container_ulimits
     repository_credentials = var.repository_credentials == "" ? null : {
       credentialsParameter = var.repository_credentials
