@@ -43,6 +43,11 @@ variable "desired_count" {
   type        = number
 }
 
+variable "task_role_permissions_boundary_arn" {
+  description = "The ARN of a permissions boundary to add to the task role"
+  default     = ""
+}
+
 variable "task_container_assign_public_ip" {
   description = "Assigned public IP to the container."
   default     = false
