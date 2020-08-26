@@ -16,15 +16,15 @@ resource "aws_cloudwatch_log_group" "main" {
 # IAM - Task execution role, needed to pull ECR images etc.
 # ------------------------------------------------------------------------------
 resource "aws_iam_role" "execution" {
-  name               = "${var.name_prefix}-task-execution-role"
-  assume_role_policy = data.aws_iam_policy_document.task_assume.json
+  name                 = "${var.name_prefix}-task-execution-role"
+  assume_role_policy   = data.aws_iam_policy_document.task_assume.json
+  permissions_boundary = var.task_role_permissions_boundary_arn
 }
 
 resource "aws_iam_role_policy" "task_execution" {
   name   = "${var.name_prefix}-task-execution"
   role   = aws_iam_role.execution.id
   policy = data.aws_iam_policy_document.task_execution_permissions.json
-  permissions_boundary = var.task_role_permissions_boundary_arn
 }
 
 resource "aws_iam_role_policy" "read_repository_credentials" {
