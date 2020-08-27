@@ -83,6 +83,12 @@ variable "task_container_command" {
   type        = list(string)
 }
 
+variable "task_container_docker_labels" {
+  type        = map(string)
+  description = "Docker labels to set for the container"
+  default     = null
+}
+
 variable "task_container_environment" {
   description = "The environment variables to pass to a container."
   default     = {}
