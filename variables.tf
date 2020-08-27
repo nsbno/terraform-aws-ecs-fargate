@@ -44,7 +44,7 @@ variable "desired_count" {
 }
 
 variable "task_role_permissions_boundary_arn" {
-  description = "The ARN of a permissions boundary to add to the task role"
+  description = "The ARN of a permissions boundary to add to the roles created by the module"
   default     = ""
 }
 
