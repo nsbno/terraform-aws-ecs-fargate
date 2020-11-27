@@ -22,9 +22,10 @@ resource "aws_iam_role" "execution" {
 }
 
 resource "aws_iam_role_policy" "task_execution" {
-  name   = "${var.name_prefix}-task-execution"
-  role   = aws_iam_role.execution.id
-  policy = data.aws_iam_policy_document.task_execution_permissions.json
+  depends_on = [aws_ecs_service.service]
+  name       = "${var.name_prefix}-task-execution"
+  role       = aws_iam_role.execution.id
+  policy     = data.aws_iam_policy_document.task_execution_permissions.json
 }
 
 resource "aws_iam_role_policy" "read_repository_credentials" {
