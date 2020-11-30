@@ -160,3 +160,8 @@ variable "repository_credentials_kms_key" {
   type        = string
 }
 
+variable "wait_for_stable_service" {
+  default     = false
+  description = "Whether to wait for the ECS service to become stable."
+  type        = bool
+}

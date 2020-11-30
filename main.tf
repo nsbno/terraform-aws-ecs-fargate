@@ -209,3 +209,25 @@ resource "null_resource" "lb_exists" {
   }
 }
 
+# NOTE: Some of this functionality is available in version 3.13.0 of the AWS provider.
+# (https://github.com/hashicorp/terraform-provider-aws/issues/3107)
+# When a task definition is updated, the AWS CLI is used to first wait for the ECS service to become stable, and finally wait for the ALB target group to be in service.
+resource "null_resource" "wait_for_stable_service" {
+  count = var.wait_for_stable_service ? 1 : 0
+  triggers = {
+    task_definition = aws_ecs_service.service.task_definition
+  }
+
+  provisioner "local-exec" {
+    interpreter = ["/usr/bin/env", "sh", "-c"]
+    command     = <<EOF
+aws ecs wait services-stable \
+  --services "${aws_ecs_service.service.name}" \
+  --cluster "${var.cluster_id}" \
+  --region "${data.aws_region.current.name}" \
+&& aws elbv2 wait target-in-service \
+  --target-group-arn "${aws_lb_target_group.task.arn}" \
+  --region "${data.aws_region.current.name}"
+EOF
+  }
+}
