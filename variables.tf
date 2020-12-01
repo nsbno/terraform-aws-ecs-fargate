@@ -165,3 +165,9 @@ variable "wait_for_stable_service" {
   description = "Whether to wait for the ECS service to become stable."
   type        = bool
 }
+
+variable "task_deregistration_delay" {
+  description = "The amount time for Elastic Load Balancing to wait before changing the state of a deregistering target from draining to unused."
+  default     = null
+  type        = number
+}

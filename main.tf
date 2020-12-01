@@ -77,10 +77,11 @@ resource "aws_security_group_rule" "egress_service" {
 # LB Target group
 # ------------------------------------------------------------------------------
 resource "aws_lb_target_group" "task" {
-  vpc_id      = var.vpc_id
-  protocol    = var.task_container_protocol
-  port        = var.task_container_port
-  target_type = "ip"
+  vpc_id               = var.vpc_id
+  protocol             = var.task_container_protocol
+  port                 = var.task_container_port
+  deregistration_delay = var.task_deregistration_delay
+  target_type          = "ip"
   dynamic "health_check" {
     for_each = [var.health_check]
     content {
