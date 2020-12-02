@@ -43,6 +43,11 @@ variable "desired_count" {
   type        = number
 }
 
+variable "task_role_permissions_boundary_arn" {
+  description = "The ARN of a permissions boundary to add to the roles created by the module"
+  default     = ""
+}
+
 variable "task_container_assign_public_ip" {
   description = "Assigned public IP to the container."
   default     = false
@@ -76,6 +81,12 @@ variable "task_container_command" {
   description = "The command that is passed to the container."
   default     = []
   type        = list(string)
+}
+
+variable "task_container_docker_labels" {
+  type        = map(string)
+  description = "Docker labels to set for the container"
+  default     = null
 }
 
 variable "task_container_environment" {

@@ -16,14 +16,16 @@ resource "aws_cloudwatch_log_group" "main" {
 # IAM - Task execution role, needed to pull ECR images etc.
 # ------------------------------------------------------------------------------
 resource "aws_iam_role" "execution" {
-  name               = "${var.name_prefix}-task-execution-role"
-  assume_role_policy = data.aws_iam_policy_document.task_assume.json
+  name                 = "${var.name_prefix}-task-execution-role"
+  assume_role_policy   = data.aws_iam_policy_document.task_assume.json
+  permissions_boundary = var.task_role_permissions_boundary_arn
 }
 
 resource "aws_iam_role_policy" "task_execution" {
-  name   = "${var.name_prefix}-task-execution"
-  role   = aws_iam_role.execution.id
-  policy = data.aws_iam_policy_document.task_execution_permissions.json
+  depends_on = [aws_ecs_service.service]
+  name       = "${var.name_prefix}-task-execution"
+  role       = aws_iam_role.execution.id
+  policy     = data.aws_iam_policy_document.task_execution_permissions.json
 }
 
 resource "aws_iam_role_policy" "read_repository_credentials" {
@@ -37,9 +39,11 @@ resource "aws_iam_role_policy" "read_repository_credentials" {
 # IAM - Task role, basic. Users of the module will append policies to this role
 # when they use the module. S3, Dynamo permissions etc etc.
 # ------------------------------------------------------------------------------
+
 resource "aws_iam_role" "task" {
-  name               = "${var.name_prefix}-task-role"
-  assume_role_policy = data.aws_iam_policy_document.task_assume.json
+  name                 = "${var.name_prefix}-task-role"
+  assume_role_policy   = data.aws_iam_policy_document.task_assume.json
+  permissions_boundary = var.task_role_permissions_boundary_arn
 }
 
 resource "aws_iam_role_policy" "log_agent" {
@@ -122,7 +126,6 @@ locals {
       value = v
     }
   ]
-
   task_secrets = [
     for k, v in var.task_container_secrets : {
       name      = k
@@ -149,10 +152,11 @@ locals {
         "awslogs-stream-prefix" : "container"
       }
     }
-    command     = var.task_container_command
-    environment = local.task_environment
-    secrets     = local.task_secrets
-    ulimits     = var.task_container_ulimits
+    command      = var.task_container_command
+    environment  = local.task_environment
+    secrets      = local.task_secrets
+    ulimits      = var.task_container_ulimits
+    dockerLabels = var.task_container_docker_labels
     repository_credentials = var.repository_credentials == "" ? null : {
       credentialsParameter = var.repository_credentials
     }
