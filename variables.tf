@@ -38,6 +38,13 @@ variable "lb_arn" {
   type        = string
 }
 
+
+variable "wait_for_steady_state" {
+  description = "Whether to wait for the ECS service to reach a steady state or not."
+  default     = false
+  type        = bool
+}
+
 variable "desired_count" {
   description = "The number of instances of the task definitions to place and keep running."
   default     = 1
