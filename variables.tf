@@ -34,6 +34,7 @@ variable "task_container_image" {
 
 variable "lb_arn" {
   description = "Arn for the LB for which the service should be attach to."
+  default     = ""
   type        = string
 }
 

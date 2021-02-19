@@ -179,7 +179,7 @@ resource "aws_ecs_service" "service" {
   launch_type                        = "FARGATE"
   deployment_minimum_healthy_percent = var.deployment_minimum_healthy_percent
   deployment_maximum_percent         = var.deployment_maximum_percent
-  health_check_grace_period_seconds  = var.health_check_grace_period_seconds
+  health_check_grace_period_seconds  = var.lb_arn != "" ? var.health_check_grace_period_seconds : null
 
   network_configuration {
     subnets          = var.private_subnet_ids
@@ -187,10 +187,13 @@ resource "aws_ecs_service" "service" {
     assign_public_ip = var.task_container_assign_public_ip
   }
 
-  load_balancer {
-    container_name   = var.container_name != "" ? var.container_name : var.name_prefix
-    container_port   = var.task_container_port
-    target_group_arn = aws_lb_target_group.task.arn
+  dynamic "load_balancer" {
+    for_each = var.lb_arn != "" ? [var.lb_arn] : []
+    content {
+      container_name   = var.container_name != "" ? var.container_name : var.name_prefix
+      container_port   = var.task_container_port
+      target_group_arn = aws_lb_target_group.task.arn
+    }
   }
 
   deployment_controller {
