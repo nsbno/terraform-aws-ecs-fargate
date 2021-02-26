@@ -168,3 +168,9 @@ variable "repository_credentials_kms_key" {
   type        = string
 }
 
+# https://docs.aws.amazon.com/AmazonECS/latest/developerguide/platform_versions.html
+variable "fargate_platform_version" {
+  description = "The Fargate platform version to use (defaults to `LATEST`)."
+  type        = string
+  default     = null
+}
